@@ -1,9 +1,9 @@
 sfZendMailPlugin
 ========
 
-Plugin based on swToolboxPlugin mail feature by Thomas Rabaix.  The primary changes from his implementation are seperating the mail feature and switching to use autoload for the Zend libraries.
+Plugin based on swToolboxPlugin mail feature by Thomas Rabaix.  The primary changes from his implementation are seperating the mail feature from swToolbox.
 
-The built in mail feature was removed from sf1.1 and sf1.2. This will simulate the sendMail method from sf1.0
+The built in mail feature was removed from sf1.1 and sf1.2. This will simulate the sendEmail method from sf1.0
 and add extras features :
 
 *  email decorator
@@ -27,37 +27,31 @@ Installation
         pear channel-discover pear.zfcampus.org
         pear install zfcampus/zf
    
-*  Edit config/autoload.yml and set the path: to the path that Zend Framework was installed/extracted to.  Specify only the framework mail folder if you don't want to auto-include all the Zend libraries.
-
-        autoload:
-          ZendFramework-Zend_Mail:
-            name:           ZendFramework-Zend_Mail
-            path:           /usr/local/zend/share/ZendFramework/library/Zend/Mail/
-            recursive:      on
-
 *  Edit the app.yml file
 
         all:
-          sf_zend_mail:    
-            charset: utf-8                             # charset to use : utf-8, iso-8859-1, ...
-            encoding: quoted-printable                 # 7bit, 8bit, quoted-printable, base64 (default : quoted-printable)
-            transport:                                 # define which transport class to used, one or the other not both
-              # sample with Sendmail
-              #class: Zend_Mail_Transport_Sendmail      # Zend_Mail_Transport_Sendmail | Zend_Mail_Transport_Smtp
-              #parameters: "-ffrom@yourdomain.com"
-              
-              # sample with Smtp
-              class: Zend_Mail_Transport_Smtp          # Zend_Mail_Transport_Sendmail | Zend_Mail_Transport_Smtp
-              parameters: 
-                - 127.0.0.1                            # URL or IP of the smtp server
-                #- { auth: Plain|Crammd5|Login, username: yourusername, password: yourpassword }  #if required, else don't set
+          sf_zend_mail:
+            #framework_location:                         /usr/local/zend/share/ZendFramework/library/Zend
+            config:    
+              charset: utf-8                             # charset to use : utf-8, iso-8859-1, ...
+              encoding: quoted-printable                 # 7bit, 8bit, quoted-printable, base64 (default : quoted-printable)
+              #transport:                                # define which transport class to used, one or the other not both
+                # sample with Sendmail
+                #class: Zend_Mail_Transport_Sendmail     # Zend_Mail_Transport_Sendmail | Zend_Mail_Transport_Smtp
+                #parameters: "-ffrom@yourdomain.com"
                 
-            decorator:                                 # define the layout use in the mail
-              enabled: off                             # on | off : set true if all your mail share the same layout
-              directory: "%SF_APP_TEMPLATE_DIR%"       # where the layout is located, ie %SF_APP_TEMPLATE_DIR%
-              template: email                          # name of the layout, automatically translate to name.FORMAT.php
-            view:                                      # define the view class used to render the template
-              class: sfZendMailView
+                # sample with Smtp
+                #class: Zend_Mail_Transport_Smtp         # Zend_Mail_Transport_Sendmail | Zend_Mail_Transport_Smtp
+                #parameters: 
+                #  - 127.0.0.1                           # URL or IP of the smtp server
+                #  - { auth: Plain|Crammd5|Login, username: yourusername, password: yourpassword }  #if required, else don't set
+                  
+              decorator:                                 # define the layout use in the mail
+                enabled: off                             # on | off : set true if all your mail share the same layout
+                directory: "%SF_APP_TEMPLATE_DIR%"       # where the layout is located, ie %SF_APP_TEMPLATE_DIR%
+                template: email                          # name of the layout, automatically translate to name.FORMAT.php
+              view:                                      # define the view class used to render the template
+                class: sfZendMailView
        
 *  Clear your cache
 
@@ -73,7 +67,7 @@ Usage
       $invoice = Doctrine::getTable('Invoice')->find(..);
       
       // call the email action
-      $action->sendMail('yourModule', 'sendInvoice', array('invoice' => $invoice);
+      $this->sendEmail('yourModule', 'sendInvoice', array('invoice' => $invoice);
     }
 
     public function executeSendInvoice(sfWebRequest $request)

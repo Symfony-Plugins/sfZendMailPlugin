@@ -1,5 +1,0 @@
-autoload:
-  ZendFramework-Zend_Mail:
-    name:           ZendFramework-Zend_Mail
-    path:           /usr/local/zend/share/ZendFramework/library/Zend/Mail/
-    recursive:      on

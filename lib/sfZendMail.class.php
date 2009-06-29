@@ -29,17 +29,18 @@
  */
 class sfZendMail extends Zend_Mail
 {
+
   public function __construct($charset = null)
   {
     if(is_null($charset))
     {
-      $config = sfConfig::get('sf_zend_mail');
+      $config = sfConfig::get('app_sf_zend_mail_config');
       $charset = $config['charset'];
     }
     
     parent::__construct($charset);
   }
-  
+
   public function quickView()
   {
     $mail = "";
@@ -50,23 +51,22 @@ class sfZendMail extends Zend_Mail
     
     return $mail;
   }
-  
+
   public function __toString()
   {
-    
     return $this->quickView();
   }
-  
+
   public function getRecipientsTo()
   {
     return $this->_to;
   }
-  
+
   public function getRecipientsBcc()
   {
     return $this->_to;
   }
-  
+
   public function getRecipientsCc()
   {
     return $this->_to;

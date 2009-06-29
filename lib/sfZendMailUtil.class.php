@@ -2,10 +2,83 @@
 
 class sfZendMailUtil
 {
+  private static $zendLoaded = false;
+
+  /**
+   * Listen to the configuration.method_not_found to extends 
+   * the configuration object
+   *
+   * @param sfEvent $event
+   */
+  static function configurationMethodNotFound(sfEvent $event)
+  {
+    $params = $event->getParameters();
+    
+    switch($params['method'])
+    {
+      case 'registerZend':
+        self::registerZend($event);
+        break;
+    }
+  }
+
+  /**
+   * Listen to the component.method_not_found to extends 
+   * the configuration object
+   *
+   * @param sfEvent $event
+   */
+  static function componentMethodNotFound(sfEvent $event)
+  {
+    $params = $event->getParameters();
+    
+    switch($params['method'])
+    {
+      case 'sendEmail':
+      case 'sendMail':
+        $event->setReturnValue(self::sendMailFromEvent($event));
+        break;
+    }
+  
+  }
+
+  /**
+   * Register zend
+   *
+   * @param sfEvent $event
+   */
+  static function registerZend(sfEvent $event)
+  {
+    $event->setProcessed(true);
+    
+    if(self::$zendLoaded)
+    {
+      
+      return;
+    }
+
+    set_include_path(sfConfig::get('app_sf_zend_mail_framework_location') . PATH_SEPARATOR . get_include_path());
+    require_once (sfConfig::get('app_sf_zend_mail_framework_location') . DIRECTORY_SEPARATOR . 'Loader.php');
+    
+    spl_autoload_register(array(
+      'Zend_Loader', 'loadClass'
+    ));
+    
+    if(! sfAutoload::getInstance()->autoload('Zend_Loader'))
+    {
+      throw new LogicException('Zend Framework Library not found at : ' . sfConfig::get('app_sf_zend_mail_framework_location'));
+    }
+    
+    self::$zendLoaded = true;
+  }
+
   static public function sendMail($moduleName, $actionName, $vars)
   {
-    $config = sfConfig::get('sf_zend_mail');
+    $config = sfConfig::get('app_sf_zend_mail_config');
     $context = sfContext::getInstance();
+    
+    // 2. REGISTER ZEND CLASS
+    $context->getConfiguration()->registerZend();
     
     // 3. CREATE THE ACTION
     $action = $context->getController()->getAction($moduleName, $actionName);
@@ -94,13 +167,14 @@ class sfZendMailUtil
         $transport_settings
       );
     }
+
+    $reflection_class = new ReflectionClass($transport_class);
     
-    if(! sfAutoload::getInstance()->loadClass($transport_class))
+    if($reflection_class->getName() != $transport_class)
     {
-      throw new LogicException('Please configure the mail sfZendMailPlugin settings');
+      throw new LogicException('Please configure the app.yml for sfZendMailPlugin');
     }
     
-    $reflection_class = new ReflectionClass($transport_class);
     $transport_class = $reflection_class->newInstanceArgs($transport_settings);
     
     $action->mail->send($transport_class);
