@@ -1,6 +1,6 @@
 all:
   sf_zend_mail:
-    #framework_location:                         /usr/local/zend/share/ZendFramework/library/Zend
+    #framework_location:                         /usr/local/zend/share/ZendFramework/library #whatever path contains the Zend folder
     config:                            
       charset: utf-8                             # charset to use : utf-8, iso-8859-1, ...
       encoding: quoted-printable                 # 7bit, 8bit, quoted-printable, base64 (default : quoted-printable)

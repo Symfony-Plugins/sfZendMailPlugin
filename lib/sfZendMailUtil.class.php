@@ -58,7 +58,7 @@ class sfZendMailUtil
     }
 
     set_include_path(sfConfig::get('app_sf_zend_mail_framework_location') . PATH_SEPARATOR . get_include_path());
-    require_once (sfConfig::get('app_sf_zend_mail_framework_location') . DIRECTORY_SEPARATOR . 'Loader.php');
+    require_once (sfConfig::get('app_sf_zend_mail_framework_location') . 'Zend'. DIRECTORY_SEPARATOR . 'Loader.php');
     
     spl_autoload_register(array(
       'Zend_Loader', 'loadClass'
