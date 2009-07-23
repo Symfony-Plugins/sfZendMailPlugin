@@ -56,9 +56,24 @@ class sfZendMailUtil
       
       return;
     }
-
-    set_include_path(sfConfig::get('app_sf_zend_mail_framework_location') . PATH_SEPARATOR . get_include_path());
-    require_once (sfConfig::get('app_sf_zend_mail_framework_location') . DIRECTORY_SEPARATOR . 'Zend'. DIRECTORY_SEPARATOR . 'Loader.php');
+    
+    //If Zend isnt installed, lets make our own include path
+    if (!class_exists('Zend_Loader')) {
+        $zendPath = sfConfig::get('app_sf_zend_mail_framework_location');
+        $chars = strlen($zendPath) - 1;
+        
+        if ($zendPath[$chars] == '/') {
+            $zendPath substr($zendPath, 0, $chars);
+        }
+        
+        $zendLoaderPath = $zendPath . DIRECTORY_SEPARATOR . 'Zend' . DIRECTORY_SEPARATOR . 'Loader.php';
+        if (!file_exists($zendLoaderPath)) {
+            throw new LogicException('Cannot locate the Zend Framework installiation path');
+        }
+        
+        set_include_path($zendPath . PATH_SEPARATOR . get_include_path());
+        require_once $zendLoaderPath;
+    }
     
     spl_autoload_register(array(
       'Zend_Loader', 'loadClass'
