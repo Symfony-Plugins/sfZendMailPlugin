@@ -63,7 +63,7 @@ class sfZendMailUtil
         $chars = strlen($zendPath) - 1;
         
         if ($zendPath[$chars] == '/') {
-            $zendPath substr($zendPath, 0, $chars);
+            $zendPath = substr($zendPath, 0, $chars);
         }
         
         $zendLoaderPath = $zendPath . DIRECTORY_SEPARATOR . 'Zend' . DIRECTORY_SEPARATOR . 'Loader.php';
