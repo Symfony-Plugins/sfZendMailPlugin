@@ -53,7 +53,6 @@ class sfZendMailUtil
 
     if(self::$zendLoaded)
     {
-
       return;
     }
 
