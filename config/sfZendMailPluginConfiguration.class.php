@@ -2,7 +2,7 @@
 
 /**
  * sfZendMailPlugin configuration.
- * 
+ *
  * @package     sfZendMailPlugin
  * @subpackage  config
  * @author      Benjamin Runnels <benjamin.r.runnels@citi.com>
@@ -17,6 +17,7 @@ class sfZendMailPluginConfiguration extends sfPluginConfiguration
    */
   public function initialize()
   {
+    $this->dispatcher->connect('routing.load_configuration', array('sfZendMailPluginRouting', 'listenToRoutingLoadConfigurationEvent'));
     $this->dispatcher->connect('component.method_not_found', array('sfZendMailUtil', 'componentMethodNotFound'));
     $this->dispatcher->connect('configuration.method_not_found', array('sfZendMailUtil', 'configurationMethodNotFound'));
   }

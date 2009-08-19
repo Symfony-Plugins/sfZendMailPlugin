@@ -26,62 +26,83 @@ Installation
 
         pear channel-discover pear.zfcampus.org
         pear install zfcampus/zf
-   
+
 *  Edit the app.yml file
 
         all:
           sf_zend_mail:
             #framework_location:                         /usr/local/zend/share/ZendFramework/library #whatever path contains the Zend folder
-            config:    
+            config:
               charset: utf-8                             # charset to use : utf-8, iso-8859-1, ...
               encoding: quoted-printable                 # 7bit, 8bit, quoted-printable, base64 (default : quoted-printable)
               #transport:                                # define which transport class to used, one or the other not both
                 # sample with Sendmail
                 #class: Zend_Mail_Transport_Sendmail     # Zend_Mail_Transport_Sendmail | Zend_Mail_Transport_Smtp
                 #parameters: "-ffrom@yourdomain.com"
-                
+
                 # sample with Smtp
                 #class: Zend_Mail_Transport_Smtp         # Zend_Mail_Transport_Sendmail | Zend_Mail_Transport_Smtp
-                #parameters: 
+                #parameters:
                 #  - 127.0.0.1                           # URL or IP of the smtp server
                 #  - { auth: Plain|Crammd5|Login, username: yourusername, password: yourpassword }  #if required, else don't set
-                  
+
               decorator:                                 # define the layout use in the mail
                 enabled: off                             # on | off : set true if all your mail share the same layout
                 directory: "%SF_APP_TEMPLATE_DIR%"       # where the layout is located, ie %SF_APP_TEMPLATE_DIR%
                 template: email                          # name of the layout, automatically translate to name.FORMAT.php
               view:                                      # define the view class used to render the template
                 class: sfZendMailView
-       
+
 *  Clear your cache
 
 
 Usage
 -----
 
-    public function executeConfirmPayment()
-    {
-      // [...]
-      
-      // create object in your controller
-      $invoice = Doctrine::getTable('Invoice')->find(..);
-      
-      // call the email action
-      $this->sendEmail('yourModule', 'sendInvoice', array('invoice' => $invoice);
-    }
+	  public function executeSendEmail()
+	  {
+	    $this->forward404Unless($this->getRequest()->isXmlHttpRequest());
+	    $this->sendEmail($this->getModuleName(), 'email');
+	    return $this->renderText(json_encode(array('success'=>true)));
+	  }
 
-    public function executeSendInvoice(sfWebRequest $request)
-    {
-      $mail = new sfZendMail;
-      
-      $mail->setSubject('Your Invoice #'.$invoice->getReference());
-      $mail->setFrom('billing@yoursite.com', 'Billing Service');
-      $mail->addTo($this->invoice->getEmail(), $this->invoice->getName());
-      
-      $this->mail = $mail;
-    }
-  
-You should have a least one template file : sendInvoiceSuccess.txt.php or sendInvoiceSuccess.html.php in your
+	  public function executeEmail(sfWebRequest $request)
+	  {
+	    $mail = new sfZendMail();
+	    $mail->setFrom($request->getParameterHolder()->get('from'));
+
+	    $tos = explode(';',$request->getParameterHolder()->get('to'));
+	    foreach($tos as $to)
+	    {
+	      $mail->addTo($to);
+	    }
+
+
+	    if($request->getParameterHolder()->get('cc',false))
+	    {
+	      $ccs = explode(';',$request->getParameterHolder()->get('cc'));
+	      foreach($ccs as $cc)
+	      {
+	        $mail->addCc($cc);
+	      }
+	    }
+
+	    if($request->getParameterHolder()->get('bcc',false))
+	    {
+	      $bccs = explode(';',$request->getParameterHolder()->get('bcc'));
+	      foreach($bccs as $bcc)
+	      {
+	        $mail->addBcc($bcc);
+	      }
+	    }
+
+	    $mail->setSubject($request->getParameterHolder()->get('subject'));
+	    // you can set the body like this instead of using a seperate template file
+	    //$mail->setBodyText($request->getParameterHolder()->get('msg'));
+	    $this->mail = $mail;
+	  }
+
+You should have a least one template file : emailSuccess.txt.php or emailSuccess.html.php in your
 module/templates folder.
 
 If you want a specific layout around your email (like default header and footer), enable the decorator option
