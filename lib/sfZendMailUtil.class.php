@@ -131,7 +131,7 @@ class sfZendMailUtil
       $view->setDecorator(false);
     }
 
-    // text version
+    // text version for backward compatibility
     try
     {
       $template = $actionName . 'Success.text.php';
@@ -151,7 +151,7 @@ class sfZendMailUtil
     catch(sfRenderException $e)
     {}
 
-    // html version
+    // html version for backward compatibility
     try
     {
       $template = $actionName . 'Success.html.php';
@@ -167,6 +167,15 @@ class sfZendMailUtil
       $html_version = $view->render($action->getVarHolder()->getAll());
 
       $action->mail->setBodyHtml($html_version, $config['charset'], $config['encoding']);
+    }
+    catch(sfRenderException $e)
+    {}
+
+    // default action version.  allows you to specify the template in the action
+    //TODO: test if decorator can be used with this method
+    try
+    {
+      $action->mail->setBodyHtml(sfContext::getInstance()->getController()->getPresentationFor($moduleName, $actionName), $config['charset'], $config['encoding']);
     }
     catch(sfRenderException $e)
     {}
