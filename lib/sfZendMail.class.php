@@ -30,45 +30,57 @@
 class sfZendMail extends Zend_Mail
 {
 
-  public function __construct($charset = null)
-  {
-    if(is_null($charset))
-    {
-      $config = sfConfig::get('app_sf_zend_mail_config');
-      $charset = $config['charset'];
-    }
-    
-    parent::__construct($charset);
-  }
+	public function __construct($charset = null)
+	{
+		if(is_null($charset))
+		{
+			$config = sfConfig::get('app_sf_zend_mail_config');
+			$charset = $config['charset'];
+		}
+		
+		parent::__construct($charset);
+	}
 
-  public function quickView()
-  {
-    $mail = "";
-    foreach($this->getParts() as $part)
-    {
-      $mail .= $part->getContent();
-    }
-    
-    return $mail;
-  }
+	public function quickView()
+	{
+		$mail = "";
+		foreach($this->getParts() as $part)
+		{
+			$mail .= $part->getContent();
+		}
+		
+		return $mail;
+	}
 
-  public function __toString()
-  {
-    return $this->quickView();
-  }
+	/**
+	 * Clears all attachment parts
+	 *
+	 * @return Zend_Mail Provides fluent interface
+	 */
+	public function clearAttachments()
+	{
+		$this->setParts(array());
+		$this->hasAttachments = false;
+		return $this;
+	}
 
-  public function getRecipientsTo()
-  {
-    return $this->_to;
-  }
+	public function __toString()
+	{
+		return $this->quickView();
+	}
 
-  public function getRecipientsBcc()
-  {
-    return $this->_to;
-  }
+	public function getRecipientsTo()
+	{
+		return $this->_to;
+	}
 
-  public function getRecipientsCc()
-  {
-    return $this->_to;
-  }
+	public function getRecipientsBcc()
+	{
+		return $this->_to;
+	}
+
+	public function getRecipientsCc()
+	{
+		return $this->_to;
+	}
 }
