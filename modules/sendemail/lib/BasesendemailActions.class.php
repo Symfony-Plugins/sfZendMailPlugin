@@ -48,7 +48,14 @@ class BasesendemailActions extends sfActions
     }
 
     $mail->setSubject($request->getParameterHolder()->get('subject'));
-    $mail->setBodyText($request->getParameterHolder()->get('msg'));
+    if($request->getParameter('content') == 'html')
+    {
+      $mail->setBodyHtml($request->getParameterHolder()->get('msg'));
+    }
+    else
+    {
+      $mail->setBodyText($request->getParameterHolder()->get('msg'));
+    }
     $this->mail = $mail;
   }
 }
