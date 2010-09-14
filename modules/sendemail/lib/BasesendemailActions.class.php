@@ -19,42 +19,66 @@ class BasesendemailActions extends sfActions
 
   public function executeEmail(sfWebRequest $request)
   {
+    $from = $request->getParameterHolder()->get('from');
+    $toStr = $request->getParameterHolder()->get('to');
+    $subject = $request->getParameterHolder()->get('subject');
+    $body = $request->getParameterHolder()->get('msg');
+    
+    $this->forward404Unless($from && $toStr && $subject && $body);
+    
+    $from = trim(str_replace(array(',', ';'), '', $from));
+    
+    echo $from;
+    
     $mail = new sfZendMail();
-    $mail->setFrom($request->getParameterHolder()->get('from'));
+    $mail->setFrom($from);
 
-    $tos = explode(';',$request->getParameterHolder()->get('to'));
+    $tos = explode(';', $toStr);
     foreach($tos as $to)
     {
-      $mail->addTo($to);
+      $to = trim($to);
+      if($to != '')
+      {
+        $mail->addTo($to);
+      }
     }
 
 
     if($request->getParameterHolder()->get('cc',false))
     {
-      $ccs = explode(';',$request->getParameterHolder()->get('cc'));
+      $ccs = explode(';', $request->getParameterHolder()->get('cc'));
       foreach($ccs as $cc)
       {
-        $mail->addCc($cc);
+        $cc = trim($cc);
+        if($cc != '')
+        {
+          $mail->addCc($cc);
+        }
       }
     }
 
     if($request->getParameterHolder()->get('bcc',false))
     {
-      $bccs = explode(';',$request->getParameterHolder()->get('bcc'));
+      $bccs = explode(';', $request->getParameterHolder()->get('bcc'));
       foreach($bccs as $bcc)
       {
-        $mail->addBcc($bcc);
+        $bcc = trim($bcc);
+        if($bcc != '')
+        {
+          $mail->addBcc($bcc);
+        }
       }
     }
 
-    $mail->setSubject($request->getParameterHolder()->get('subject'));
+    $mail->setSubject($subject);
+    
     if($request->getParameter('content') == 'html')
     {
-      $mail->setBodyHtml($request->getParameterHolder()->get('msg'));
+      $mail->setBodyHtml($body);
     }
     else
     {
-      $mail->setBodyText($request->getParameterHolder()->get('msg'));
+      $mail->setBodyText($body);
     }
     $this->mail = $mail;
   }
