@@ -27,9 +27,7 @@ class BasesendemailActions extends sfActions
     $this->forward404Unless($from && $toStr && $subject && $body);
     
     $from = trim(str_replace(array(',', ';'), '', $from));
-    
-    echo $from;
-    
+        
     $mail = new sfZendMail();
     $mail->setFrom($from);
 
